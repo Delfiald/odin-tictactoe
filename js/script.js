@@ -10,6 +10,12 @@ const GameBoard = (() => {
     player1: createPlayer('X', 'John Doe', true),
     player2: createPlayer('O', 'Jane Doe', false)
   }
+  
+  let highlight = {
+    horizontal: [],
+    vertical: [],
+    diagonal: []
+  };
 
   let board = Array.from({length: 3}, () => Array(3).fill(null));
 
@@ -21,19 +27,25 @@ const GameBoard = (() => {
     let horizontal = true;
     let vertical = true;
     let diagonal = false;
-    
-    let highlight = {};
+
+    resetHighlight();
 
     if(board[x][y] === mark){
       for(let i = 0; i < board.length; i++){
         // Check Horizontal
         if(board[x][y] != board[x][i]){
           horizontal = false;
+        }else {
+          addHighlight('horizontal', [x, i]);
+          // highlight.horizontal.push([x, i]);
         }
   
         // Check Vertical
         if(board[x][y] != board[i][y]){
           vertical = false;
+        }else {
+          addHighlight('vertical', [i, y]);
+          // highlight.vertical.push([i, y]);
         }
       }
 
@@ -44,10 +56,12 @@ const GameBoard = (() => {
       if(isMainDiagonal || isAntiDiagonal) {
         if(isMainDiagonal) {
           diagonal = board[0][0] === mark && board[1][1] === mark && board[2][2] === mark;
+          if(diagonal) addHighlight('diagonal', [[0, 0], [1, 1], [2, 2]]);
         }
 
         if(isAntiDiagonal){
           diagonal = board[0][2] === mark && board[1][1] === mark && board[2][0] === mark;
+          if(diagonal) addHighlight('diagonal', [[0, 2], [1, 1], [2, 0]]);
         }
       }
     }
@@ -55,10 +69,13 @@ const GameBoard = (() => {
     if(horizontal || vertical || diagonal){
       if(horizontal){
         console.log('horizontal');
+        renderHighlight('horizontal');
       }else if(vertical){
         console.log('vertical');
+        renderHighlight('vertical');
       }else if( diagonal) {
         console.log('diagonal');
+        renderHighlight('diagonal');
       }
       console.log(`player with ${mark} wins`);
       console.log(board);
@@ -69,6 +86,31 @@ const GameBoard = (() => {
       return true;
     }
     return false;
+  }
+
+  const addHighlight = (track, grids) => {
+    if(track){
+      highlight[track].push(grids);
+    }
+  }
+
+  const resetHighlight = (track) => {
+    if(track){
+      highlight[track] = [];
+    }else{
+      highlight = {
+        horizontal: [],
+        vertical: [],
+        diagonal: []
+      };
+    }
+  }
+
+  const renderHighlight = (track) => {
+    if(track){
+      console.log('here');
+      console.log(highlight[track]);
+    }
   }
 
   const switchPlayer = () => {
@@ -92,6 +134,7 @@ const GameBoard = (() => {
     board = Array.from({length: 3}, () => Array(3).fill(null));
     round = true;
     currentPlayer = 'player1';
+    resetHighlight();
   }
   
   const roundEnd = () => {
@@ -100,6 +143,7 @@ const GameBoard = (() => {
       player1: players['player1'].scores,
       player2: players['player2'].scores
     });
+
     round = false;
     rounds++;
 
@@ -125,7 +169,7 @@ const GameBoard = (() => {
       }
     }
 
-    if(winner.human) {
+    if(winner.isHuman) {
       console.log(`Player ${player} Win`)
     }else{
       console.log('AI Win')
@@ -154,13 +198,13 @@ const GameBoard = (() => {
     },
     player: (player, marker, isHuman, name) => {
       if(players[player]){
-        players[player].marker = createPlayer(marker, name, isHuman);
+        players[player] = createPlayer(marker, name, isHuman);
       }
       console.log(players);
     },
     playerInfo: () => ({
       marker: players[currentPlayer].marker,
-      isHuman: players[currentPlayer].human,
+      isHuman: players[currentPlayer].isHuman,
       playerName: players[currentPlayer].name
     }),
     move: (x, y) => {
@@ -172,8 +216,11 @@ const GameBoard = (() => {
         }else{
           switchPlayer();
         }
+      }else if(!round){
+        console.log('Round Ended')
+        return true;
       }else{
-        console.log('filled or round ended');
+        console.log('Filled');
         return true;
       }
     },
