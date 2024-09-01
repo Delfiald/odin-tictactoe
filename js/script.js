@@ -1,15 +1,14 @@
+const createPlayer = (marker, name, isHuman) => ({
+  marker,
+  scores: 0,
+  name,
+  isHuman
+})
+
 const GameBoard = (() => {
   const players = {
-    player1: {
-      marker: '',
-      scores: 0,
-      human: true
-    },
-    player2: {
-      marker: '',
-      scores: 0,
-      human: false
-    }
+    player1: createPlayer('X', 'John Doe', true),
+    player2: createPlayer('O', 'Jane Doe', false)
   }
 
   let board = Array.from({length: 3}, () => Array(3).fill(null));
@@ -153,17 +152,16 @@ const GameBoard = (() => {
       const boardCopy = board.map(row => [...row]);
       console.log(boardCopy);
     },
-    player: (player, marker, isHuman) => {
+    player: (player, marker, isHuman, name) => {
       if(players[player]){
-        players[player].marker = marker;
-        players[player].human = isHuman;
+        players[player].marker = createPlayer(marker, name, isHuman);
       }
-
       console.log(players);
     },
     playerInfo: () => ({
       marker: players[currentPlayer].marker,
-      isHuman: players[currentPlayer].human
+      isHuman: players[currentPlayer].human,
+      playerName: players[currentPlayer].name
     }),
     move: (x, y) => {
       if(board[x][y] === null && round){
@@ -224,6 +222,5 @@ document.addEventListener('click', (e) => {
   }
 })
 
-
-GameBoard.player('player1', '#', true);
-GameBoard.player('player2', '*', false);
+GameBoard.player('player1', '#', true, 'John Doe');
+GameBoard.player('player2', '*', false, 'Jane Doe');
