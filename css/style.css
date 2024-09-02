@@ -127,7 +127,7 @@ main .game-container::after {
   height: 100%;
   background: var(--dark-200-color);
   z-index: 1;
-  transition: .5s all 2s ease;
+  transition: .5s all 0s ease;
   opacity: 0;
   visibility: hidden;
 }
@@ -136,6 +136,7 @@ main.winner .game-container::after,
 main.tie .game-container::after {
   opacity: .75;
   visibility: visible;
+  transition: .5s all 2s ease;
 }
 
 main > *:not(.game-container) {
@@ -150,7 +151,7 @@ main > *:not(.game-container) {
   z-index: 2;
   opacity: 0;
   visibility: hidden;
-  transition: .5s all ease 2s;
+  transition: .5s all ease 0s;
   color: var(--light-400-color);
   gap: 1rem;
   font-size: 2rem;
@@ -203,12 +204,14 @@ body.tie main .restart-button .restart-wrapper h1 {
 main .restart-button.restart{
   opacity: 1;
   visibility: visible;
+  transition: .5s all 2s ease;
 }
 
 main.winner .next-button,
 main.tie .next-button {
   opacity: 1;
   visibility: visible;
+  transition: .5s all ease 2s;
 }
 
 main.winner .game-container,
@@ -343,6 +346,7 @@ aside .outcome {
   top: 0;
   font-size: 3rem;
   opacity: 0;
+  visibility: hidden;
   white-space: nowrap;
   transition: .5s all ease 0s;
 }
@@ -368,6 +372,7 @@ aside .player-info {
 }
 
 aside .player-info .player-marker {
+  justify-self: end;
   width: 50px;
   height: 50px;
   display: flex;
@@ -446,6 +451,7 @@ aside.player2-section {
 }
 
 aside.player2-section .player-info .player-marker {
+  justify-self: start;
   order: -1;
 }
 
@@ -510,6 +516,7 @@ footer .socials {
   left: 0;
   margin: 1rem;
   cursor: pointer;
+  min-height: min-content !important;
 }
 
 .menu {
@@ -676,14 +683,20 @@ footer .socials {
   overflow: hidden;
 }
 
-.menu .settings-content .player-status > * {
-  flex-basis: 50%;
-  width: 50%;
+.menu .settings-content .player-status label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 1rem 2rem;
+  height: 100%;
   cursor: pointer;
 }
 
-.menu .settings-content .player-status > *.active {
+.menu .settings-content .player-status input {
+  display: none;
+}
+
+.menu .settings-content .player-status input:checked ~ label {
   background: var(--crimson-color);
   color: var(--light-200-color);
 }
@@ -709,6 +722,382 @@ footer .socials {
 
 .menu .settings-content .close-settings:hover i {
   transform: translateY(15%);
+}
+
+/* Start Menu */
+.start {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+  transition: .5s all 1s ease;
+}
+
+.start.hide {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.start.hide .player-1 {
+  animation: start-slide-1 1s ease forwards;
+}
+
+.start.hide .player-2 {
+  animation: start-slide-2 1s ease forwards;
+}
+
+.start-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background: var(--light-500-color);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  transition: .25s all 1s ease;
+}
+
+.start.begin .start-wrapper{
+  background: transparent;
+}
+
+.start-wrapper .start-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 100px;
+  background: var(--dark-200-color);
+  color: var(--light-200-color);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  gap: 1rem;
+  border: 1px solid var(--dark-400-color);
+  box-shadow: 0px 0px 5px 0px var(--dark-400-color);
+  cursor: pointer;
+  transition: .5s all ease;
+  z-index: 3;
+  overflow: hidden;
+}
+
+.start-wrapper .start-button .wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: .5s all ease;
+  position: relative;
+}
+
+.start-wrapper .start-button .wrapper > div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-180deg);
+  opacity: 0;
+  visibility: hidden;
+  transition: .5s all ease 1s;
+  font-size: 2rem;
+}
+
+.start.begin .start-button .wrapper > div {
+  opacity: 1;
+  visibility: visible;
+}
+
+.start-wrapper .start-button:hover .wrapper {
+  gap: 0;
+}
+
+.start.begin .start-button .wrapper {
+  gap: 0;
+}
+
+.start .start-button .wrapper i {
+  transition: .5s all 1s ease;
+}
+
+.start.begin .start-button .wrapper i {
+  transform: scale(5);
+  opacity: 0;
+  visibility: hidden;
+}
+
+.start.begin .start-wrapper .start-button {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.start-wrapper .player-1,
+.start-wrapper .player-2 {
+  position: relative;
+}
+
+.start-wrapper .player-1::before,
+.start-wrapper .player-2::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--light-500-color);
+  border-right: 2px solid var(--dark-400-color);
+  transform-origin: center;
+  transform: scaleY(0);
+  transition: 1s all ease;
+  z-index: -1;
+}
+
+.start-wrapper .player-2::before {
+  border-left: 2px solid var(--dark-400-color);
+  border-right: 0;
+}
+
+.start.begin .start-wrapper .player-1::before,
+.start.begin .start-wrapper .player-2::before {
+  transform: scaleY(1);
+}
+
+.start .player-1,
+.start .player-2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+  gap: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: .5s all .5s ease;
+}
+
+.start.begin .player-1,
+.start.begin .player-2 {
+  opacity: 1;
+  visibility: visible;
+}
+
+.start .player-1 h1,
+.start .player-2 h1 {
+  position: absolute;
+  top: 15vh;
+}
+
+.start .player-1 .status,
+.start .player-2 .status {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.start .player-1 .status input[type="radio"],
+.start .player-2 .status input[type="radio"] {
+  display: none;
+}
+
+.start .player-1 .status > label,
+.start .player-2 .status > label {
+  border: 1px solid var(--dark-400-color);
+  padding: 2rem 3rem;
+  cursor: pointer;
+  transition: .5s all ease;
+  border-radius: 10px;
+  font-weight: bolder;
+  font-size: 2rem;
+}
+
+.start .player-1 .status > label:hover,
+.start .player-2 .status > label:hover {
+  background-color: var(--dark-200-color);
+  color: var(--light-200-color);
+}
+
+.start .player-1.status .status input:checked + label,
+.start .player-2.status .status input:checked + label {
+  transform: translateY(-100%);
+  border: 0;
+  pointer-events: none;
+  opacity: 1;
+  visibility: visible;
+}
+
+.start .player-1.status .status input:nth-of-type(2):checked + label,
+.start .player-2.status .status input:nth-of-type(2):checked + label {
+  transform: translateY(calc(-200% - 1rem));
+}
+
+.start .player-1.status .status > label,
+.start .player-2.status .status > label {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.marker-select {
+  opacity: 0;
+  visibility: hidden;
+  transition: .25s all 0s ease;
+}
+
+.start .input {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1;
+  font-size: 1.5rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: .5s all 0s ease;
+  pointer-events: none;
+}
+
+.player-1.status .input,
+.player-2.status .input {
+  opacity: 1;
+  visibility: visible;
+  transition: .5s all .25s ease;
+  pointer-events: initial;
+}
+
+.start .input input {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--dark-200-color);
+  border-radius: 0;
+  font-size: 1rem;
+}
+
+.marker-select {
+  opacity: 0;
+  visibility: hidden;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  padding: .25rem;
+  z-index: 2;
+  background: var(--light-200-color);
+  border-radius: 50px;
+  border: 1px solid var(--dark-200-color);
+  transition: .5s all ease;
+}
+
+.player-1.status .marker-select,
+.player-2.status .marker-select {
+  opacity: 1;
+  visibility: visible;
+}
+
+.marker-select .marker-wrapper{
+  width: 100px;
+  height: 100px;
+  transform: scaleY(1);
+  cursor: pointer;
+}
+
+.marker-select .marker-wrapper:hover .marker {
+  box-shadow: 0px 0px 5px 0px var(--dark-400-color);
+}
+
+.marker-select .marker-wrapper::before {
+  transform: scaleY(1) translate(-50%, -50%);
+}
+
+.marker-select .marker-wrapper .marker {
+  transform: scaleY(1);
+}
+
+.marker-select .marker-wrapper.hide {
+  filter: brightness(.25);
+}
+
+.start .back-button {
+  position: absolute;
+  left: 15%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  transition: .5s all ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.start .player-2 .back-button {
+  left: 85%;
+}
+
+.player-1.status .back-button,
+.player-2.status .back-button {
+  opacity: 1;
+  visibility: visible;
+}
+
+.alert {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  z-index: 3;
+  opacity: 0;
+  visibility: hidden;
+  transition: .5s all ease;
+}
+
+.alert.trigger{
+  opacity: 1;
+  visibility: visible;
+}
+
+.alert .marker-alert {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert .marker-alert::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: var(--dark-200-color);
+  opacity: .5;
+  z-index: -1;
+}
+
+.alert .marker-alert .marker-alert-wrapper {
+  padding: 1rem;
+  background: var(--light-400-color);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.alert .marker-alert .marker-alert-wrapper .close-button {
+  cursor: pointer;
+  border: 1px solid var(--dark-200-color);
+  padding: .5rem;
+  border-radius: 10px;
 }
 
 @keyframes marked {
@@ -778,5 +1167,25 @@ footer .socials {
 
   100% {
     transform: translate(0, 0);
+  }
+}
+
+@keyframes start-slide-1 {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes start-slide-2 {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(100%);
   }
 }

@@ -19,14 +19,12 @@
   </header>
 
   <aside class="player1-section">
-    <div class="outcome"><h1>Player 1 Wins</h1></div>
+    <div class="outcome"><h1><span class="player1name">Player 1</span> Wins</h1></div>
     <div class="player-wrapper">
       <div class="player-info">
-        <div class="player-name">Player 1</div>
+        <div class="player-name"><span class="player1name">Player 1</span></div>
         <div class="player-marker">
-          <div class="marker-wrapper">
-            <div class="marker marker-1"></div>
-          </div>
+          
         </div>
         <div class="player-status">Human</div>
       </div>
@@ -65,16 +63,14 @@
   </main>
 
   <aside class="player2-section">
-    <div class="outcome"><h1>Player 2 Wins</h1></div>
+    <div class="outcome"><h1><span class="player2name">Player 2</span> Wins</h1></div>
     <div class="player-wrapper">
       <div class="player-info">
-        <div class="player-name">Player 2</div>
+        <div class="player-name"><span class="player2name">Player 2</span></div>
         <div class="player-marker">
-          <div class="marker-wrapper">
-            <div class="marker marker-2"></div>
-          </div>
+          
         </div>
-        <div class="player-status">AI</div>
+        <div class="player-status">COM</div>
       </div>
       <div class="player-life">
         <div></div>
@@ -109,21 +105,33 @@
             <div class="player-1">
               <div class="input-wrapper">
                 <label for="name1">P1</label>
-                <input type="text" id="name1" name="name1" placeholder="Player 1 Name">
+                <input type="text" id="name1" name="name1" placeholder="Player 1 Name" value="Player 1">
               </div>
               <div class="player-status">
-                <div class="player active">Human</div>
-                <div class="ai">COM</div>
+                <div>
+                  <input type="radio" id="p1human" name="p1status" value="true">
+                  <label for="p1human" class="player">Human</label>
+                </div>
+                <div>
+                  <input type="radio" id="p1com" name="p1status" value="false">
+                  <label for="p1com" class="ai">COM</label>
+                </div>
               </div>
             </div>
             <div class="player-2">
               <div class="input-wrapper">
                 <label for="name2">P2</label>
-                <input type="text" id="name2" name="name2" placeholder="Player 1 Name">
+                <input type="text" id="name2" name="name2" placeholder="Player 2 Name" value="Player 2">
               </div>
               <div class="player-status">
-                <div class="player">Human</div>
-                <div class="ai active">COM</div>
+                <div>
+                  <input type="radio" id="p2human" name="p2status" value="true">
+                  <label for="p2human" class="player">Human</label>
+                </div>
+                <div>
+                  <input type="radio" id="p2com" name="p2status" value="false">
+                  <label for="p2com" class="ai">COM</label>
+                </div>
               </div>
             </div>
             <div class="close-settings"><i class="fas fa-chevron-down"></i></div>
@@ -134,6 +142,83 @@
             <i class="fas fa-x"></i>
           </div>
           <div class="button-text">Close</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="start">
+    <div class="start-wrapper">
+      <div class="start-button">
+        <div class="wrapper">
+          <div>Start</div>
+          <i class="fas fa-x"></i>
+          <i class="fas fa-o"></i>
+        </div>
+      </div>
+      <div class="player-1">
+        <h1>Player 1</h1>
+        <div class="status">
+          <input type="radio" name="inputStatusp1" id="inputHumanp1" value="true">
+          <label for="inputHumanp1" class="human-button">Human
+          </label>
+          <input type="radio" name="inputStatusp1" id="inputComp1" value="false">
+          <label for="inputComp1" class="com-button">Com
+          </label>
+        </div>
+        <div class="input">
+          <label for="input-name-p1">Declare Name</label>
+          <input type="text" id="input-name-p1" name="inputNamep1" placeholder="John Doe" required>
+        </div>
+        <div class="marker-select">
+          <div class="marker-wrapper" data-marker = '#'>
+            <div class="marker marker-1">
+            </div>
+          </div>
+          <div class="marker-wrapper" data-marker = '*'>
+            <div class="marker marker-2">
+            </div>
+          </div>
+        </div>
+        <div class="back-button">
+          <i class="fas fa-arrow-left fa-2x"></i>
+        </div>
+      </div>
+      <div class="player-2">
+        <h1>Player 2</h1>
+        <div class="status">
+          <input type="radio" name="inputStatusp2" id="inputHumanp2" value="true">
+          <label for="inputHumanp2" class="human-button">Human
+          </label>
+          <input type="radio" name="inputStatusp2" id="inputComp2" value="false">
+          <label for="inputComp2" class="com-button">Com
+          </label>
+        </div>
+        <div class="input">
+          <label for="input-name-p2">Declare Name</label>
+          <input type="text" id="input-name-p2" name="inputNamep2" placeholder="Jane Doe" required>
+        </div>
+        <div class="marker-select">
+          <div class="marker-wrapper" data-marker = '#'>
+            <div class="marker marker-1">
+            </div>
+          </div>
+          <div class="marker-wrapper" data-marker = '*'>
+            <div class="marker marker-2">
+            </div>
+          </div>
+        </div>
+        <div class="back-button">
+          <i class="fas fa-arrow-right fa-2x"></i>
+        </div>
+      </div>
+      <div class="alert">
+        <div class="marker-alert">
+          <div class="marker-alert-wrapper">
+            <i class="fas fa-circle-exclamation fa-3x"></i>
+            Markers cannot be the same for both players.
+            <div class="close-button">Close</div>
+          </div>
         </div>
       </div>
     </div>
