@@ -25,6 +25,10 @@ const GameBoard = (() => {
   let currentPlayer = 'player1';
   let round = true;
 
+  const roundText = document.querySelector('.hero .round');
+
+  roundText.textContent = rounds;
+
   const getCurrentMarker = () => {
     return players[currentPlayer].marker;
   }
@@ -59,12 +63,15 @@ const GameBoard = (() => {
       // Check Diagonal
       const isMainDiagonal = (x === y);
       const isAntiDiagonal = (x + y == 2);
-      console.log("here: " + isAntiDiagonal);
+      console.log("here1: " + isMainDiagonal);
+      console.log("here2: " + isAntiDiagonal);
 
       if(isMainDiagonal || isAntiDiagonal) {
         if(isMainDiagonal) {
-          diagonal = board[0][0] === mark && board[1][1] === mark && board[2][2] === mark;
-          if(diagonal) {
+          console.log("jalan main");
+          const mainDiagonal = board[0][0] === mark && board[1][1] === mark && board[2][2] === mark;
+          if(mainDiagonal) {
+            diagonal = true;
             addHighlight('diagonal', [0, 0]);
             addHighlight('diagonal', [1, 1]);
             addHighlight('diagonal', [2, 2]);
@@ -72,8 +79,10 @@ const GameBoard = (() => {
         }
 
         if(isAntiDiagonal){
-          diagonal = board[0][2] === mark && board[1][1] === mark && board[2][0] === mark;
-          if(diagonal) {
+          console.log("jalan anti");
+          const antiDiagonal = board[0][2] === mark && board[1][1] === mark && board[2][0] === mark;
+          if(antiDiagonal) {
+            diagonal = true;
             addHighlight('diagonal', [0, 2]);
             addHighlight('diagonal', [1, 1]);
             addHighlight('diagonal', [2, 0]);
@@ -196,6 +205,7 @@ const GameBoard = (() => {
     currentPlayer = 'player1';
     highlighted = {};
     resetHighlight();
+    body.classList.remove('p1-wins', 'p2-wins', 'tie');
   }
   
   const roundEnd = () => {
@@ -214,6 +224,8 @@ const GameBoard = (() => {
     }
   }
 
+  const body = document.querySelector('body')
+
   const gameEnded = () => {
     let winner;
     let player;
@@ -222,14 +234,23 @@ const GameBoard = (() => {
       console.log("It's a Tie");
       nextButton.classList.add('hidden');
       restartButton.classList.add('restart');
+      setTimeout(() => {
+        body.classList.add('tie')
+      }, 1000)
       return;
     }else {
       if(players.player1.scores > players.player2.scores) {
         winner = players.player1;
         player = 1;
+        setTimeout(() => {
+          body.classList.add('p1-wins')
+        }, 1000)
       }else{
         winner = players.player2;
         player = 2;
+        setTimeout(() => {
+          body.classList.add('p2-wins')
+        }, 1000)
       }
     }
 
@@ -246,6 +267,7 @@ const GameBoard = (() => {
   const manageRound = (restartGame = false) => {
     if(restartGame) {
       rounds = 1;
+      roundText.textContent = rounds;
       players.player1.scores = 0;
       players.player2.scores = 0;
       player1Life.forEach(life => {
@@ -257,6 +279,8 @@ const GameBoard = (() => {
     }else{
       if(rounds > 3) {
         return;
+      }else{  
+        roundText.textContent = rounds;
       }
     }
     
@@ -441,8 +465,11 @@ document.addEventListener('click', (e) => {
     menu.classList.toggle('show');
   }else if(e.target.closest('.next-button')) {
     next();
-  }else if(e.target.closest('restart-button')) {
+  }else if(e.target.closest('.restart-button')) {
     next(true);
+    menu.classList.remove('show');
+  }else if(e.target.closest('.settings-button') || e.target.closest('.close-settings')) {
+    menu.classList.toggle('settings');
   }
 })
 

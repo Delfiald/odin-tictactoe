@@ -39,6 +39,14 @@ button {
   font-weight: 500;
 }
 
+input {
+  padding: .5rem 1rem;
+  border-radius: 5px;
+  outline: none;
+  border: 1px solid var(--dark-400-color);
+  font-family: inherit;
+}
+
 /* Body */
 body {
   padding: 1rem;
@@ -60,63 +68,11 @@ body {
   text-align: center;
   gap: 1rem;
   position: relative;
+  transition: 1s all ease;
 }
 
 body > *:not(.menu) {
   min-height: 100%;
-}
-
-.menu-button {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 1rem;
-  cursor: pointer;
-}
-
-.menu {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 2;  
-  opacity: 0;
-  visibility: hidden;
-}
-
-.menu.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.menu-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--light-200-color);
-}
-
-.menu .menu-wrapper::before {
-  position: absolute;
-  content: '';
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--dark-200-color);
-  transition: .3s all ease;
-  opacity: .75;
-  z-index: -1;
-}
-
-.menu-wrapper .menu-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Header */
@@ -130,6 +86,7 @@ main {
   justify-content: center;
   grid-area: main;
   position: relative;
+  z-index: 1;
 }
 
 main .game-container {
@@ -146,6 +103,7 @@ main .game-container {
   padding: 1rem;
   gap: 5px;
   position: relative;
+  background-color: var(--light-500-color);
 }
 
 main .game-container::before {
@@ -219,6 +177,29 @@ main .next-button.hidden {
   visibility: hidden !important;
 }
 
+main .restart-button .restart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+main .restart-button .restart-wrapper h1 {
+  position: absolute;
+  top: 25%;
+  transform: translateY(-25%);
+  opacity: 0;
+  visibility: hidden;
+}
+
+body.tie main .restart-button .restart-wrapper h1 {
+  opacity: 1;
+  visibility: visible;
+}
+
 main .restart-button.restart{
   opacity: 1;
   visibility: visible;
@@ -232,7 +213,7 @@ main.tie .next-button {
 
 main.winner .game-container,
 main.tie .game-container {
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 main .game-container > div {
@@ -351,7 +332,19 @@ aside {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   gap: 1rem;
+  transition: 1s all ease 1s;
+  position: relative;
+}
+
+aside .outcome {
+  position: absolute;
+  top: 0;
+  font-size: 3rem;
+  opacity: 0;
+  white-space: nowrap;
+  transition: .5s all ease 0s;
 }
 
 aside .player-wrapper {
@@ -465,6 +458,34 @@ aside.player2-section .player-status {
   justify-self: end;
 }
 
+/* Outcome */
+body.p1-wins {
+  grid-template-columns: 1.5fr 75vh 0.25fr;
+}
+
+body.p2-wins {
+  grid-template-columns: 0.25fr 75vh 1.5fr;
+}
+
+body.p1-wins .player2-section {
+  opacity: 0;
+  visibility: hidden;
+  transition: .35s all ease 0s;
+}
+
+body.p2-wins .player1-section {
+  opacity: 0;
+  visibility: hidden;
+  transition: .3s all ease 0s;
+}
+
+body.p1-wins aside .outcome,
+body.p2-wins aside .outcome {
+  opacity: 1;
+  visibility: visible;
+  transition: .5s all ease 1s;
+}
+
 /* Footer */
 footer {
   grid-area: footer;
@@ -480,6 +501,214 @@ footer .socials {
   align-items: center;
   justify-content: center;
   gap: 1rem;
+}
+
+/* Menu */
+.menu-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1rem;
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;  
+  opacity: 0;
+  visibility: hidden;
+}
+
+.menu.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.menu-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--light-200-color);
+}
+
+.menu .menu-wrapper::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--dark-200-color);
+  transition: .3s all ease;
+  opacity: .75;
+  z-index: -1;
+}
+
+.menu-wrapper .menu-content {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.menu-wrapper .menu-content > * {
+  justify-self: center;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: .5s all ease;
+  position: relative;
+  transform: translateY(-25%);
+  gap: 1rem;
+  width: 100px;
+  height: 100px;
+}
+
+.menu-wrapper .menu-content > div > div:nth-child(1) {
+  width: 100%;
+  height: 100%;
+  background: var(--light-200-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--dark-200-color);
+}
+
+.menu-wrapper .menu-content > div > :nth-child(1):hover {
+  filter: brightness(.85);
+}
+
+.menu-wrapper .menu-content .button-text {
+  top: -50%;
+  transform: translateY(100%);
+  opacity: 0;
+  visibility: hidden;
+  transition: .3s all ease;
+  font-weight: bolder;
+  pointer-events: none;
+  position: absolute;
+}
+
+.menu-wrapper .menu-content > div > :nth-child(1):hover ~ .button-text {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Menu Settings */
+.menu.settings .menu-content > *:not(.settings-button-wrapper) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.menu.settings .settings-button-wrapper {
+  width: 50vw !important;
+  height: 50vh !important;
+  transition: .5s all 0s ease;
+}
+
+.menu.settings .menu-wrapper .menu-content > div > .settings-button {
+  border-radius: 2% !important;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.menu.settings .menu-wrapper .menu-content > div > .settings-button i {
+  align-self: flex-start;
+}
+
+.menu .settings-content {
+  position: absolute;
+  z-index: 2;
+  color: var(--dark-200-color);
+  opacity: 0;
+  visibility: hidden;
+  transition: .5s all 0s ease;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.menu.settings .settings-content {
+  opacity: 1;
+  visibility: visible;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  transition: .5s all ease .5s;
+}
+
+.menu .settings-content .input-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.menu .settings-content > * {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.menu .settings-content .player-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  border: 1px solid var(--dark-400-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.menu .settings-content .player-status > * {
+  flex-basis: 50%;
+  width: 50%;
+  padding: 1rem 2rem;
+  cursor: pointer;
+}
+
+.menu .settings-content .player-status > *.active {
+  background: var(--crimson-color);
+  color: var(--light-200-color);
+}
+
+.menu .settings-content .close-settings {
+  justify-self: center;
+  align-self: end;
+  padding: 1rem;
+  border: 1px solid var(--dark-400-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  grid-column: 1 / -1;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.menu .settings-content .close-settings i {
+  transition: .5s all ease;
+}
+
+.menu .settings-content .close-settings:hover i {
+  transform: translateY(15%);
 }
 
 @keyframes marked {

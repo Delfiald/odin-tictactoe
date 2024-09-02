@@ -14,11 +14,12 @@
 
   <header>
     <div class="hero">
-      <h1>Tic Tac Toe</h1>
+      <h1>Round: <span class="round"></span></h1>
     </div>
   </header>
 
   <aside class="player1-section">
+    <div class="outcome"><h1>Player 1 Wins</h1></div>
     <div class="player-wrapper">
       <div class="player-info">
         <div class="player-name">Player 1</div>
@@ -56,11 +57,15 @@
       <i class="fas fa-chevron-right"></i>
     </div>
     <div class="restart-button">
-      <i class="fas fa-rotate-left fa-3x"></i>
+      <div class="restart-wrapper">
+        <h1>Draw</h1>
+        <i class="fas fa-rotate-left fa-3x"></i>
+      </div>
     </div>
   </main>
 
   <aside class="player2-section">
+    <div class="outcome"><h1>Player 2 Wins</h1></div>
     <div class="player-wrapper">
       <div class="player-info">
         <div class="player-name">Player 2</div>
@@ -89,7 +94,47 @@
   <div class="menu">
     <div class="menu-wrapper">
       <div class="menu-content">
-        <button type="button" class="close-button">Close</button>
+        <div class="restart-button-wrapper">
+          <div class="restart-button">
+            <i class="fas fa-rotate-left"></i>
+          </div>
+          <div class="button-text">Restart</div>
+        </div>
+        <div class="settings-button-wrapper">
+          <div class="settings-button">
+            <i class="fas fa-gear"></i>
+          </div>
+          <div class="button-text">Settings</div>
+          <div class="settings-content">
+            <div class="player-1">
+              <div class="input-wrapper">
+                <label for="name1">P1</label>
+                <input type="text" id="name1" name="name1" placeholder="Player 1 Name">
+              </div>
+              <div class="player-status">
+                <div class="player active">Human</div>
+                <div class="ai">COM</div>
+              </div>
+            </div>
+            <div class="player-2">
+              <div class="input-wrapper">
+                <label for="name2">P2</label>
+                <input type="text" id="name2" name="name2" placeholder="Player 1 Name">
+              </div>
+              <div class="player-status">
+                <div class="player">Human</div>
+                <div class="ai active">COM</div>
+              </div>
+            </div>
+            <div class="close-settings"><i class="fas fa-chevron-down"></i></div>
+          </div>
+        </div>
+        <div class="close-button-wrapper">
+          <div class="close-button">
+            <i class="fas fa-x"></i>
+          </div>
+          <div class="button-text">Close</div>
+        </div>
       </div>
     </div>
   </div>
