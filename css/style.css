@@ -79,6 +79,10 @@ body > *:not(.menu) {
 /* Header */
 header {
   grid-area: header;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Main */
@@ -340,6 +344,7 @@ aside {
   gap: 1rem;
   transition: 1s all ease 1s;
   position: relative;
+  overflow: hidden;
 }
 
 aside .outcome {
@@ -381,7 +386,7 @@ aside .player-info .player-marker {
   justify-content: center;
   border: 1px solid var(--dark-400-color);
   border-radius: 50%;
-  box-shadow: 0px 0px 5px 0px var(--crimson-color);
+  box-shadow: 0px 0px 5px 0px var(--crimson-200-color);
 }
 
 aside .player-info .marker-wrapper {
@@ -419,7 +424,7 @@ aside .player-life > div {
   -webkit-box-shadow: 0px 0px 5px 0px var(--dark-200-color); 
   box-shadow: 0px 0px 5px 0px var(--dark-200-color);
   border-radius: 50%;
-  background: var(--crimson-color);
+  background: var(--crimson-200-color);
   position: relative;
   transition: .3s all .25s ease;
 }
@@ -542,6 +547,7 @@ footer .socials {
   align-items: center;
   justify-content: center;
   color: var(--light-200-color);
+  overflow: hidden;
 }
 
 .menu .menu-wrapper::before {
@@ -698,7 +704,7 @@ footer .socials {
 }
 
 .menu .settings-content .player-status input:checked ~ label {
-  background: var(--crimson-color);
+  background: var(--crimson-200-color);
   color: var(--light-200-color);
 }
 
@@ -734,6 +740,7 @@ footer .socials {
   visibility: visible;
   z-index: 2;
   transition: .5s all 1s ease;
+  overflow: hidden;
 }
 
 .start.hide {
@@ -885,8 +892,7 @@ footer .socials {
   visibility: visible;
 }
 
-.start .player-1 h1,
-.start .player-2 h1 {
+.start h1 {
   position: absolute;
   top: 15vh;
 }
@@ -1193,6 +1199,163 @@ footer .socials {
 }
 
 /* Media Queries */
-@media (max-width: 1300px) {
+@media (max-width: 1100px) {
+  aside .outcome {
+    font-size: 2rem;
+    white-space: normal;
+  }
   
+  .start h1 {
+    top: 5vh;
+  }
+}
+
+@media (max-width: 1100px) and (orientation: portrait) {
+  body {
+    grid-template-columns: .5fr 37.5vw 37.5vw .5fr;
+    grid-template-rows: 50px 75vw auto auto;
+  }
+
+  body.p1-wins {
+    grid-template-columns: .5fr 37.5vw 37.5vw .5fr;
+  }
+
+  body.p2-wins {
+    grid-template-columns: .5fr 37.5vw 37.5vw .5fr;
+  }
+
+  main {
+    grid-column: 2 / 4;
+  }
+
+  aside .outcome {
+    position: relative;
+  }
+
+  aside.player1-section {
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+    width: 100%;
+  }
+
+  body.p1-wins aside.player1-section {
+    transform: translateX(0);
+    width: 200%;
+  }
+
+  body.p2-wins aside.player1-section {
+    transform: translateX(-50%);
+  }
+
+  aside.player2-section {
+    grid-column: 3 / 5;
+    grid-row: 3 / 4;
+  }
+
+  body.p1-wins aside.player2-section {
+    transform: translateX(50%);
+  }
+
+  body.p2-wins aside.player2-section {
+    transform: translateX(-50%);
+    width: 200%;
+  }
+
+  footer {
+    grid-row: 4 / 5;
+    grid-column: 1 / -1;
+  }
+
+  .menu.settings .settings-button-wrapper {
+    width: 75vw !important;
+    height: 50vw !important;
+  }
+}
+
+@media (max-width: 600px) {
+  aside .outcome {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 10px;
+    color: var(--light-200-color);
+    z-index: 2;
+    font-size: 1.5rem;
+  }
+
+  aside .player-info {
+    grid-template-columns: 1fr;
+  }
+
+  aside.player1-section .player-info .player-marker {
+    justify-self: center;
+  }
+
+  aside.player2-section .player-info .player-marker {
+    order: 0;
+    justify-self: center;
+  }
+
+  .menu-wrapper .menu-content {
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+
+  .menu.settings .settings-button-wrapper {
+    transform: translateY(2.5%);
+    height: 75vh !important;
+  }
+  
+  .menu .settings-content > * {
+    grid-column: 1 / -1;
+  }
+
+  .start-wrapper {
+    grid-auto-flow: dense;
+    font-size: .8rem !important;
+  }
+
+  .start-wrapper label {
+    font-size: 1rem !important;
+  }
+
+  .start-wrapper .marker-wrapper {
+    width: 75px;
+    height: 75px;
+  }
+
+  .start .player-1, .start .player-2 {
+    grid-column: 1 / -1;
+  }
+
+  .start .player-1 h1 {
+    top: 10vh;
+    right: 1rem;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  .start .player-2 h1 {
+    top: 10vh;
+    left: 1rem;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+
+  .start .player-1.status .status input:checked + label,
+  .start .player-2.status .status input:checked + label {
+    transform: translateY(-75%);
+  }
+
+  .start .player-2.status .status input:checked + label {
+    transform: translateY(200%);
+  }
+
+  .start .player-1.status .status input:nth-of-type(2):checked + label {
+    transform: translateY(calc(-175% - 1rem));
+  }
+  .start .player-2.status .status input:nth-of-type(2):checked + label {
+    transform: translateY(calc(75% + .25rem));
+  }
 }
