@@ -9,7 +9,8 @@
   --dark-400-color: #333;
   --dark-700-color: #3E2723;
 
-  --crimson-color: #B30000;
+  --crimson-200-color: #B30000;
+  --crimson-400-color: #8B0000;
 }
 
 * {
@@ -286,7 +287,7 @@ main .game-container > div {
 }
 
 .marker-wrapper .marker-2 {
-  background: #8B0000;
+  background: var(--crimson-400-color);
 }
 
 main .game-container > div.marked .marker-wrapper .marker {
@@ -1100,6 +1101,7 @@ footer .socials {
   border-radius: 10px;
 }
 
+/* Animation */
 @keyframes marked {
   0% {
     transform: scaleY(.85) translateY(0);
@@ -1188,4 +1190,9 @@ footer .socials {
   100% {
     transform: translateX(100%);
   }
+}
+
+/* Media Queries */
+@media (max-width: 1300px) {
+  
 }
