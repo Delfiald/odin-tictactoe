@@ -10,6 +10,8 @@ const GameBoard = (() => {
     player1: createPlayer('X', 'John Doe', true),
     player2: createPlayer('O', 'Jane Doe', false)
   }
+
+  let board = Array.from({length: 3}, () => Array(3).fill(null));
   
   let highlight = {
     horizontal: [],
@@ -19,15 +21,9 @@ const GameBoard = (() => {
 
   let highlighted = {};
 
-  let board = Array.from({length: 3}, () => Array(3).fill(null));
-
   let rounds = 1;
   let currentPlayer = 'player1';
   let round = true;
-
-  const roundText = document.querySelector('.hero .round');
-
-  roundText.textContent = rounds;
 
   const getCurrentMarker = () => {
     return players[currentPlayer].marker;
@@ -63,12 +59,9 @@ const GameBoard = (() => {
       // Check Diagonal
       const isMainDiagonal = (x === y);
       const isAntiDiagonal = (x + y == 2);
-      console.log("here1: " + isMainDiagonal);
-      console.log("here2: " + isAntiDiagonal);
 
       if(isMainDiagonal || isAntiDiagonal) {
         if(isMainDiagonal) {
-          console.log("jalan main");
           const mainDiagonal = board[0][0] === mark && board[1][1] === mark && board[2][2] === mark;
           if(mainDiagonal) {
             diagonal = true;
@@ -79,7 +72,6 @@ const GameBoard = (() => {
         }
 
         if(isAntiDiagonal){
-          console.log("jalan anti");
           const antiDiagonal = board[0][2] === mark && board[1][1] === mark && board[2][0] === mark;
           if(antiDiagonal) {
             diagonal = true;
@@ -91,39 +83,29 @@ const GameBoard = (() => {
       }
     }
 
-      if(horizontal || vertical || diagonal){
-        setTimeout(() => {
-          if(horizontal){
-            console.log('horizontal');
-            renderHighlight('horizontal');
-          }else if(vertical){
-            console.log('vertical');
-            renderHighlight('vertical');
-          }else if( diagonal) {
-            console.log('diagonal');
-            renderHighlight('diagonal');
-          }
-          console.log(`player with ${mark} wins`);
-          console.log(board);
-        }, 50)
-  
-        // Adding Scores;
-        players[currentPlayer].scores++;
-
-        if(currentPlayer === 'player1'){
-          player2Life[players[currentPlayer].scores - 1].classList.add('loss')
-        }else{
-          player1Life[players[currentPlayer].scores - 1].classList.add('loss')
-        }
-  
-        gameContainer.parentElement.classList.add('winner');
-        
-        return true;
+    if(horizontal || vertical || diagonal){
+      if(horizontal){
+        renderHighlight('horizontal');
+      }else if(vertical){
+        renderHighlight('vertical');
+      }else if( diagonal) {
+        renderHighlight('diagonal');
       }
+
+      // Adding Scores;
+      players[currentPlayer].scores++;
+
+      DOMController.playerHealthHandler(currentPlayer);
+
+      DOMController.roundHandler('winner')
+      
+      return true;
+    }
 
     return false;
   }
 
+  // Highlight
   const addHighlight = (track, grids) => {
     if(track){
       highlight[track].push(grids);
@@ -145,9 +127,7 @@ const GameBoard = (() => {
   const renderHighlight = (track) => {
     if(track){
       highlighted = highlight[track];
-
-      console.log(highlighted);
-      highlightGrids(highlighted, getAllGrid);
+      DOMController.highlightGrids(highlighted);
     }
   }
 
@@ -167,24 +147,11 @@ const GameBoard = (() => {
       return;
     }
 
-    const x = random[randomIndex][0];
-    const y = random[randomIndex][1];
-
-    console.log(x, y);
-
-    setTimeout(() =>{
-      gameContainer.style.pointerEvents = 'initial';
-      GameBoard.move(x, y);
-    }, 500)
-
-    gameContainer.style.pointerEvents = 'none';
+    DOMController.ComMove(random, randomIndex);
   }
 
   const switchPlayer = () => {
-    console.log('switch player');
     currentPlayer = currentPlayer === 'player1' ? 'player2' : 'player1';
-
-    console.log('player selanjutnya: '+players[currentPlayer].isHuman);
 
     if(!players[currentPlayer].isHuman){
       comHandler();
@@ -200,31 +167,25 @@ const GameBoard = (() => {
       }
     }
 
-    gameContainer.parentElement.classList.add('tie');
+    DOMController.roundHandler('tie');
     return true;
   }
 
+  // Reset
   const reset = () => {
-    console.log("Game Reseted");
     board = Array.from({length: 3}, () => Array(3).fill(null));
     round = true;
     currentPlayer = 'player1';
     highlighted = {};
     resetHighlight();
-    body.classList.remove('p1-wins', 'p2-wins', 'tie');
 
     if(!players[currentPlayer].isHuman){
       comHandler();
     }
   }
   
+  // Round End Check
   const roundEnd = () => {
-    console.log("Round Ended");
-    console.log({
-      player1: players['player1'].scores,
-      player2: players['player2'].scores
-    });
-
     round = false;
 
     rounds++;
@@ -234,150 +195,67 @@ const GameBoard = (() => {
     }
   }
 
-  const body = document.querySelector('body')
-
+  // Game Ended
   const gameEnded = () => {
-    let winner;
-    let player;
-
     if(players.player1.scores === players.player2.scores) {
-      console.log("It's a Tie");
-      nextButton.classList.add('hidden');
-      restartButton.classList.add('restart');
+      DOMController.gameEndedHandler();
       setTimeout(() => {
-        body.classList.add('tie')
+        DOMController.outcomeHandler('tie');
       }, 1000)
       return;
     }else {
       if(players.player1.scores > players.player2.scores) {
-        winner = players.player1;
-        player = 1;
         setTimeout(() => {
-          body.classList.add('p1-wins')
+          DOMController.outcomeHandler('p1-wins')
         }, 1000)
       }else{
-        winner = players.player2;
-        player = 2;
         setTimeout(() => {
-          body.classList.add('p2-wins')
+          DOMController.outcomeHandler('p2-wins')
         }, 1000)
       }
     }
-
-    if(winner.isHuman) {
-      console.log(`Player ${player} Win`)
-    }else{
-      console.log('AI Win')
-    }
     
-    nextButton.classList.add('hidden');
-    restartButton.classList.add('restart');
+    DOMController.gameEndedHandler();
   }
 
+  // Managing Round (Next or Restart)
   const manageRound = (restartGame = false) => {
     if(restartGame) {
       rounds = 1;
-      roundText.textContent = rounds;
       players.player1.scores = 0;
       players.player2.scores = 0;
-      player1Life.forEach(life => {
-        life.classList.remove('loss');
-      })
-      player2Life.forEach(life => {
-        life.classList.remove('loss');
-      })
+      
     }else{
       if(rounds > 3) {
         return;
-      }else{  
-        roundText.textContent = rounds;
       }
     }
     
     reset();
   }
 
-  const addingMarker = (x, y, marker) => {
-    const dataset = x + ',' + y;
-    let getGrid;
-
-    grids.forEach(grid => {
-      if(grid.dataset.grid === dataset){
-        getGrid = grid;
-      }
-    })
-    const cloneMarker = markerTemplate.cloneNode(true);
-    getGrid.innerHTML = '';
-    if(marker === marker1){
-      cloneMarker.querySelector('.marker').classList.add('marker-1');
-      getGrid.appendChild(cloneMarker);
-    }
-    else if(marker === marker2){
-      cloneMarker.querySelector('.marker').classList.add('marker-2');
-      getGrid.appendChild(cloneMarker);
-    }
-    getGrid.classList.add('marked');
+  const getCurrentRound = () => {
+    return rounds;
   }
 
-  const player1Name = document.querySelectorAll('.player1name');
-  const player2Name = document.querySelectorAll('.player2name');
-  const player1Marker = document.querySelector('.player1-section .player-marker');
-  const player2Marker = document.querySelector('.player2-section .player-marker');
-  const player1Status = document.querySelector('.player1-section .player-status')
-  const player2Status = document.querySelector('.player2-section .player-status')
+  // Edit Player
   const player1InputName = document.querySelector('#name1');
   const player2InputName = document.querySelector('#name2');
 
-  const player1InputStatus = document.querySelectorAll('.menu .player-1 .player-status input')
-  const player2InputStatus = document.querySelectorAll('.menu .player-2 .player-status input')
+  const player1InputStatus = document.querySelectorAll('.menu .player-1 .player-status input');
+  const player2InputStatus = document.querySelectorAll('.menu .player-2 .player-status input');
 
   const getPlayerStatus = () => {
-    player1Name.forEach((name) => {
-      name.textContent = players.player1.name;
-      console.log(name);
-    })
-  
-    player2Name.forEach((name) => {
-      name.textContent = players.player2.name;
-    })
-
-    if (player1Marker.childElementCount === 0) {
-      const cloneMarker1 = markerTemplate.cloneNode(true);
-      if(players.player1.marker === '#'){
-        cloneMarker1.querySelector('.marker').classList.add('marker-1');
-      } else {
-        cloneMarker1.querySelector('.marker').classList.add('marker-2');
-      }
-      player1Marker.appendChild(cloneMarker1);
+    const p1 = {
+      name: players.player1.name,
+      isHuman: players.player1.isHuman
+    }
+    const p2 = {
+      name: players.player2.name,
+      isHuman: players.player2.isHuman
     }
 
-    if (player2Marker.childElementCount === 0) {
-        const cloneMarker2 = markerTemplate.cloneNode(true);
-        if(players.player2.marker === '*'){
-          cloneMarker2.querySelector('.marker').classList.add('marker-2');
-        } else {
-          cloneMarker2.querySelector('.marker').classList.add('marker-1');
-        }
-        player2Marker.appendChild(cloneMarker2);
-    }
-
-    player1InputName.value = players.player1.name;
-    player2InputName.value = players.player2.name;
-
-    player1Status.textContent = players.player1.isHuman ? 'Human' : 'COM';
-    player2Status.textContent = players.player2.isHuman ? 'Human' : 'COM';
-
-    player1InputStatus.forEach((radio) =>{
-      if(players.player1.isHuman.toString() === radio.value) {
-        radio.checked = true;
-      }
-    })
-
-    player2InputStatus.forEach((radio) =>{
-      if(players.player2.isHuman.toString() === radio.value) {
-        radio.checked = true;
-      }
-    })
+    DOMController.playerDOMHandler(p1, p2);
 
     if(!players[currentPlayer].isHuman){
       comHandler();
@@ -421,7 +299,10 @@ const GameBoard = (() => {
       if(players[player]){
         players[player] = createPlayer(marker, name, isHuman);
       }
-      getPlayerStatus();
+
+      if(player === 'player2'){
+        getPlayerStatus();
+      }
     },
     playerInfo: () => ({
       marker: getCurrentMarker(),
@@ -433,7 +314,7 @@ const GameBoard = (() => {
         const currentMarker = getCurrentMarker();
         board[x][y] = currentMarker;
 
-        addingMarker(x, y, currentMarker)
+        DOMController.addingMarker(x, y, currentMarker)
 
         if(gameLogic(x, y, currentMarker)){
           roundEnd();
@@ -445,7 +326,6 @@ const GameBoard = (() => {
 
         return true;
       }else if(!round){
-        console.log('Round Ended')
         return false;
       }
     },
@@ -453,226 +333,367 @@ const GameBoard = (() => {
         player1: players['player1'].scores,
         player2: players['player2'].scores
     }),
-    manageRound: manageRound
+    manageRound: manageRound,
+    getCurrentRound: getCurrentRound
   };
 })();
 
-const marker1 = '#'
-const marker2 = '*'
+const DOMController = (() => {
+  const menu = document.querySelector('.menu');
+  const alert = document.querySelector('.alert');
+  const start = document.querySelector('.start');
+  const nextButton = document.querySelector('.next-button');
+  const restartButton = document.querySelector('.restart-button');
+  const getAllGrid = document.querySelectorAll('.grid');
+  const player1Marker = document.querySelector('.player1-section .player-marker');
+  const player2Marker = document.querySelector('.player2-section .player-marker');
+  const body = document.querySelector('body');
+  const grids = document.querySelectorAll('.grid');
 
-const player1Life = document.querySelectorAll('.player1-section .player-life > div')
-const player2Life = document.querySelectorAll('.player2-section .player-life > div')
+  const player1Life = document.querySelectorAll('.player1-section .player-life > div');
+  const player2Life = document.querySelectorAll('.player2-section .player-life > div');
+  const markerTemplate = document.querySelector('#marker').content;
+
+  const roundText = document.querySelector('.hero .round');
+  const gameContainer = document.querySelector('.game-container');
+
+  const player1Name = document.querySelectorAll('.player1name');
+  const player2Name = document.querySelectorAll('.player2name');
+  const player1Status = document.querySelector('.player1-section .player-status');
+  const player2Status = document.querySelector('.player2-section .player-status');
+  const player1InputName = document.querySelector('#name1');
+  const player2InputName = document.querySelector('#name2');
+
+  const player1InputStatus = document.querySelectorAll('.menu .player-1 .player-status input');
+  const player2InputStatus = document.querySelectorAll('.menu .player-2 .player-status input');
+
+  // Get Grid and Grid Position
+  const moveHandler = (e) => {
+    const getGrid = e.target.closest('.game-container > div');
+    const gridPosition = getGrid.dataset.grid;
+    const [x, y] = gridPosition.split(',');
+  
+    move(x, y);
+  }
+
+  // Handle COM Move
+  const ComMove = (random, randomIndex) => {
+    const x = random[randomIndex][0];
+    const y = random[randomIndex][1];
+
+    setTimeout(() =>{
+      gameContainer.style.pointerEvents = 'initial';
+      GameBoard.move(x, y);
+    }, 500)
+
+    gameContainer.style.pointerEvents = 'none';
+  }
+
+  // Highlighting Grid
+  function highlightGrids(highlighted) {
+    for (let i = 0; i < highlighted.length; i++) {
+      const highlightString = highlighted[i].join(',');
+      
+      getAllGrid.forEach(grid => {
+        const markerWrapper = grid.querySelector('.marker-wrapper');
+        
+        if (highlightString === grid.dataset.grid && markerWrapper) {
+          markerWrapper.style.animation = `highlighted .5s ease ${i * .25}s forwards`;
+          grid.classList.add('highlighted');
+        }
+      });
+    }
+  }
+
+  // Life Handler
+  const playerHealthHandler = (currentPlayer) => {
+    if(currentPlayer === 'player1'){
+      player2Life[GameBoard.getScores().player1 - 1].classList.add('loss')
+    }else{
+      player1Life[GameBoard.getScores().player2 - 1].classList.add('loss')
+    }
+  }
+
+  // Round Outcome Handler
+  const roundHandler = (status) => {
+    gameContainer.parentElement.classList.add(status);
+  }
+  
+  // Reset
+  const reset = () => {
+    roundText.textContent = GameBoard.getCurrentRound();
+    nextButton.classList.remove('hidden');
+    restartButton.classList.remove('restart');
+    gameContainer.parentElement.classList.remove('winner', 'tie');
+    grids.forEach(grid => {
+      grid.classList.remove('highlighted', 'marked');
+      grid.innerHTML = '';
+    })
+  }
+
+  // Restart handler
+  const restartHandler = () => {
+    body.classList.remove('p1-wins', 'p2-wins', 'tie');
+
+    player1Life.forEach(life => {
+      life.classList.remove('loss');
+    })
+    player2Life.forEach(life => {
+      life.classList.remove('loss');
+    })
+  }
+  
+  // Next Button Handler
+  const next = (restart = false) => {
+    if(restart){
+      restartHandler();
+    }
+    GameBoard.manageRound(restart);
+    
+    reset();
+  }
+
+  // Adding Restart UI
+  const gameEndedHandler = () => {
+    nextButton.classList.add('hidden');
+    restartButton.classList.add('restart');
+  }
+
+  // Game Outcome Handler
+  const outcomeHandler = (className) => {
+    body.classList.add(className)
+  }
+
+  // AppendMarker
+  const appendMarker = (marker, getGrid, cloneMarker) => {
+    if(!cloneMarker){
+      cloneMarker = markerTemplate.cloneNode(true);
+    }
+    
+    if(marker === '#'){
+      cloneMarker.querySelector('.marker').classList.add('marker-1');
+      getGrid.appendChild(cloneMarker);
+    }
+    else if(marker === '*'){
+      cloneMarker.querySelector('.marker').classList.add('marker-2');
+      getGrid.appendChild(cloneMarker);
+    }
+  }
+
+  // Adding Marker
+  const addingMarker = (x, y, marker) => {
+    const dataset = x + ',' + y;
+    let getGrid;
+
+    grids.forEach(grid => {
+      if(grid.dataset.grid === dataset){
+        getGrid = grid;
+      }
+    });
+
+    getGrid.innerHTML = '';
+
+    appendMarker(marker, getGrid)
+    getGrid.classList.add('marked');
+  }
+  
+  // Hover Effects
+  const showMarker = (e) => {
+    const getGrid = e.target.closest('.game-container > div');
+  
+    if(getGrid.classList.contains('marked')){
+      return;
+    }
+  
+    const marker = GameBoard.playerInfo().marker;
+    const cloneMarker = markerTemplate.cloneNode(true);
+    cloneMarker.querySelector('.marker-wrapper').style.opacity = '.5';
+
+    appendMarker(marker, getGrid, cloneMarker);
+  }
+  
+  const removeMarker = (e) => {
+    const getGrid = e.target.closest('.game-container > div');
+    if(getGrid.classList.contains('marked')){
+      return;
+    }
+    
+    getGrid.innerHTML = '';
+  }
+
+  // Edit Player DOM
+  const playerDOMHandler = (p1, p2) => {
+    player1Name.forEach((name) => {
+      name.textContent = p1.name;
+    })
+  
+    player2Name.forEach((name) => {
+      name.textContent = p2.name;
+    })
+
+    player1InputName.value = p1.name;
+    player2InputName.value = p2.name;
+
+    player1Status.textContent = p1.isHuman ? 'Human' : 'COM';
+    player2Status.textContent = p2.isHuman ? 'Human' : 'COM';
+
+    player1InputStatus.forEach((radio) =>{
+      if(p1.isHuman.toString() === radio.value) {
+        radio.checked = true;
+      }
+    })
+
+    player2InputStatus.forEach((radio) =>{
+      if(p2.isHuman.toString() === radio.value) {
+        radio.checked = true;
+      }
+    })
+  }
+
+  // Set Player Marker Each Player Section
+  const playerMarkerHandler = (player1, player2) => {
+    if (player1Marker.childElementCount === 0) {
+      const cloneMarker1 = markerTemplate.cloneNode(true);
+      if(player1 === '#'){
+        cloneMarker1.querySelector('.marker').classList.add('marker-1');
+      } else {
+        cloneMarker1.querySelector('.marker').classList.add('marker-2');
+      }
+      player1Marker.appendChild(cloneMarker1);
+    }
+
+    if (player2Marker.childElementCount === 0) {
+      const cloneMarker2 = markerTemplate.cloneNode(true);
+      if(player2 === '*'){
+        cloneMarker2.querySelector('.marker').classList.add('marker-2');
+      } else {
+        cloneMarker2.querySelector('.marker').classList.add('marker-1');
+      }
+      player2Marker.appendChild(cloneMarker2);
+    }
+  }
+  
+  // Input Handler
+  const getPlayerInfo = (playerNumber) => {
+    const playerNameInput = document.querySelector(`#input-name-p${playerNumber}`);
+    
+    const playerRadio = document.querySelector(`.start .player-${playerNumber} input[type="radio"]:checked`);
+  
+    if (!playerRadio) {
+      return null;
+    }
+  
+    if(!playerNameInput.reportValidity()){
+      return;
+    }
+  
+    const playerName = playerNameInput.value;
+  
+    const playerMarker = document.querySelector(`.start .player-${playerNumber} .marker-wrapper.active`);
+  
+    if (!playerName || !playerMarker) {
+      return null;
+    }
+    
+    const playerStatus = playerRadio ? playerRadio.value === 'true' : false;
+    const marker = playerMarker ? playerMarker.dataset.marker : '';
+  
+    return { playerName, playerStatus, marker };
+  }
+  
+  const startGame = () => {
+    const player1 = getPlayerInfo(1);
+    const player2 = getPlayerInfo(2);
+    
+    if(!player1 || !player2){
+      return;
+    }
+    
+    if(player1.marker === player2.marker){
+      alert.classList.add('trigger');
+      return;
+    }
+  
+    GameBoard.player('player1', player1.marker, player1.playerStatus, player1.playerName);
+    GameBoard.player('player2', player2.marker, player2.playerStatus, player2.playerName);
+
+    playerMarkerHandler(player1.marker, player2.marker)
+  
+    start.classList.add('hide');
+
+    roundText.textContent = GameBoard.getCurrentRound();
+  }
+  
+  // Click
+  document.addEventListener('click', (e) => {
+    const target = e.target;
+    if(target.closest('.game-container > div')){
+      moveHandler(e);
+    }else if(target.closest('.menu-button') || target.closest('.menu .close-button')) {
+      menu.classList.toggle('show');
+    }else if(target.closest('.next-button')) {
+      next();
+    }else if(target.closest('.restart-button')) {
+      next(true);
+      menu.classList.remove('show');
+    }else if(target.closest('.settings-button') || target.closest('.close-settings')) {
+      menu.classList.toggle('settings');
+    }else if(target.closest('.begin .start-button')){
+      startGame();
+    }else if(target.closest('.start-button')) {
+      start.classList.add('begin')
+    }else if(target.closest('.start .human-button') || target.closest('.start .com-button')){
+      const player = target.closest('.player-1, .player-2');
+  
+      player.classList.add('status');
+    }else if(target.closest('.start .marker-select .marker-wrapper')){
+      const player = target.closest('.player-1, .player-2');
+  
+      const playerMarker = player.querySelectorAll('.marker-wrapper');
+      playerMarker.forEach(marker => {
+        marker.classList.remove('active');
+        marker.classList.add('hide');
+      })
+      target.closest('.marker-wrapper').classList.add('active');
+      target.closest('.marker-wrapper').classList.remove('hide');
+    }else if(target.closest('.start .back-button')){
+      const player = target.closest('.player-1, .player-2');
+      player.classList.remove('status');
+      const playerMarker = player.querySelectorAll('.marker-wrapper');
+      playerMarker.forEach(marker => {
+        marker.classList.remove('active');
+        marker.classList.remove('hide');
+      })
+    }else if(target.closest('.alert .close-button')){
+      alert.classList.remove('trigger');
+    }
+  })
+  
+  // Hover Effects
+  grids.forEach(grid => {
+    grid.addEventListener('mouseenter', (e) => {
+      showMarker(e);
+    })
+  
+    grid.addEventListener('mouseleave', (e) => {
+      removeMarker(e);
+    })
+  })
+
+  return {
+    highlightGrids,
+    addingMarker,
+    gameEndedHandler,
+    outcomeHandler,
+    playerHealthHandler,
+    roundHandler,
+    ComMove,
+    playerDOMHandler
+  }
+})()
 
 const move = (x, y) => {
-  console.log(x, y)
-  console.log(GameBoard.playerInfo().isHuman);
-
-  const marker = GameBoard.playerInfo().marker;
-  console.log(marker);
-
   if(GameBoard.playerInfo().isHuman){
     GameBoard.move(x, y);
   }
 }
-
-function highlightGrids(highlighted, getAllGrid) {
-  for (let i = 0; i < highlighted.length; i++) {
-    const highlightString = highlighted[i].join(',');
-    
-    getAllGrid.forEach(grid => {
-      const markerWrapper = grid.querySelector('.marker-wrapper');
-      
-      if (highlightString === grid.dataset.grid && markerWrapper) {
-        markerWrapper.style.animation = `highlighted .5s ease ${i * .25}s forwards`;
-        grid.classList.add('highlighted');
-      }
-    });
-  }
-}
-
-const nextButton = document.querySelector('.next-button');
-const restartButton = document.querySelector('.restart-button');
-
-const next = (restart = false) => {
-  GameBoard.manageRound(restart)
-  
-  reset();
-}
-
-const reset = () => {
-  gameContainer.parentElement.classList.remove('winner', 'tie');
-  nextButton.classList.remove('hidden');
-  restartButton.classList.remove('restart');
-  grids.forEach(grid => {
-    grid.classList.remove('highlighted', 'marked');
-    grid.innerHTML = '';
-  })
-}
-
-// UI
-const gameContainer = document.querySelector('.game-container');
-const getAllGrid = gameContainer.querySelectorAll('.grid');
-const markerTemplate = document.querySelector('#marker').content;
-const menu = document.querySelector('.menu');
-
-const moveHandler = (e) => {
-  console.log('here')
-  const getGrid = e.target.closest('.game-container > div');
-  const gridPosition = getGrid.dataset.grid;
-  const [x, y] = gridPosition.split(',');
-
-  move(x, y);
-}
-
-const showMarker = (e) => {
-  const getGrid = e.target.closest('.game-container > div');
-
-  if(getGrid.classList.contains('marked')){
-    return;
-  }
-
-  const marker = GameBoard.playerInfo().marker;
-
-  const cloneMarker = markerTemplate.cloneNode(true);
-  cloneMarker.querySelector('.marker-wrapper').style.opacity = '.5';
-  if(marker === marker1){
-    cloneMarker.querySelector('.marker').classList.add('marker-1');
-    getGrid.appendChild(cloneMarker);
-  }
-  else if(marker === marker2){
-    cloneMarker.querySelector('.marker').classList.add('marker-2');
-    getGrid.appendChild(cloneMarker);
-  }
-}
-
-const removeMarker = (e) => {
-  const getGrid = e.target.closest('.game-container > div');
-  if(getGrid.classList.contains('marked')){
-    return;
-  }
-  
-  getGrid.innerHTML = '';
-}
-
-const getPlayerInfo = (playerNumber) => {
-  const playerNameInput = document.querySelector(`#input-name-p${playerNumber}`);
-  
-  const playerRadio = document.querySelector(`.start .player-${playerNumber} input[type="radio"]:checked`);
-
-  if (!playerRadio) {
-    console.log("gak jalan")
-    return null;
-  }
-
-  if(!playerNameInput.reportValidity()){
-    return;
-  }
-
-  const playerName = playerNameInput.value;
-
-  const playerMarker = document.querySelector(`.start .player-${playerNumber} .marker-wrapper.active`);
-
-  if (!playerName || !playerMarker) {
-    console.log("gak jalan")
-    return null;
-  }
-  
-  const playerStatus = playerRadio ? playerRadio.value === 'true' : false;
-  const marker = playerMarker ? playerMarker.dataset.marker : '';
-
-  return { playerName, playerStatus, marker };
-}
-
-const alert = document.querySelector('.alert');
-
-const startGame = () => {
-  const player1 = getPlayerInfo(1);
-  const player2 = getPlayerInfo(2);
-  
-  if(!player1 || !player2){
-    return;
-  }
-  
-  if(player1.marker === player2.marker){
-    alert.classList.add('trigger');
-    return;
-  }
-
-  console.log(player1.playerName);
-  console.log(player1.playerStatus);
-  console.log(player1.marker);
-
-  console.log(player2.playerName);
-  console.log(player2.playerStatus);
-  console.log(player2.marker);
-
-  GameBoard.player('player1', player1.marker, player1.playerStatus, player1.playerName);
-  GameBoard.player('player2', player2.marker, player2.playerStatus, player2.playerName);
-
-  start.classList.add('hide');
-}
-
-const start = document.querySelector('.start');
-
-document.addEventListener('click', (e) => {
-  if(e.target.closest('.circle')){
-    const x = Math.floor(Math.random() * 3);
-    const y = Math.floor(Math.random() * 3);
-    move(x, y);
-  }else if(e.target.closest('.reset')){
-    next();
-  }else if(e.target.closest('.restart')){
-    next(true);
-  }else if(e.target.closest('.game-container > div')){
-    moveHandler(e);
-  }else if(e.target.closest('.menu-button') || e.target.closest('.menu .close-button')) {
-    menu.classList.toggle('show');
-  }else if(e.target.closest('.next-button')) {
-    next();
-  }else if(e.target.closest('.restart-button')) {
-    next(true);
-    menu.classList.remove('show');
-  }else if(e.target.closest('.settings-button') || e.target.closest('.close-settings')) {
-    menu.classList.toggle('settings');
-  }else if(e.target.closest('.begin .start-button')){
-    startGame();
-  }else if(e.target.closest('.start-button')) {
-    start.classList.add('begin')
-  }else if(e.target.closest('.start .human-button') || e.target.closest('.start .com-button')){
-    const player = e.target.closest('.player-1, .player-2');
-
-    player.classList.add('status');
-  }else if(e.target.closest('.start .marker-select .marker-wrapper')){
-    const player = e.target.closest('.player-1, .player-2');
-
-    const playerMarker = player.querySelectorAll('.marker-wrapper');
-    playerMarker.forEach(marker => {
-      marker.classList.remove('active');
-      marker.classList.add('hide');
-    })
-    e.target.closest('.marker-wrapper').classList.add('active');
-    e.target.closest('.marker-wrapper').classList.remove('hide');
-  }else if(e.target.closest('.start .back-button')){
-    const player = e.target.closest('.player-1, .player-2');
-    player.classList.remove('status');
-    const playerMarker = player.querySelectorAll('.marker-wrapper');
-    playerMarker.forEach(marker => {
-      marker.classList.remove('active');
-      marker.classList.remove('hide');
-    })
-  }else if(e.target.closest('.alert .close-button')){
-    alert.classList.remove('trigger');
-  }
-})
-
-const grids = document.querySelectorAll('.grid');
-
-grids.forEach(grid => {
-  grid.addEventListener('mouseenter', (e) => {
-    showMarker(e);
-  })
-
-  grid.addEventListener('mouseleave', (e) => {
-    removeMarker(e);
-  })
-})
